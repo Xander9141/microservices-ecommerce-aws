@@ -1,7 +1,9 @@
 @echo off
-echo ================================
-echo   AUTO PUSH A GITHUB
-echo ================================
+color 0A
+
+echo ==================================
+echo        AUTO PUSH GITHUB
+echo ==================================
 echo.
 
 cd /d "C:\Users\Admin\Desktop\microservices-ecommerce-aws"
@@ -17,15 +19,24 @@ for %%A in (temp_status.txt) do if %%~zA==0 (
 
 del temp_status.txt
 
-echo Agregando cambios...
+echo.
+set /p mensaje=Mensaje del commit: 
+
+echo.
+echo Agregando archivos...
 git add .
 
+echo.
 echo Creando commit...
-git commit -m "Auto update %date% %time%"
+git commit -m "%mensaje%"
 
-echo Subiendo a GitHub...
+echo.
+echo Subiendo cambios...
 git push
 
 echo.
-echo Listo. Cambios subidos correctamente.
+echo ==================================
+echo     PUSH COMPLETADO
+echo ==================================
+
 pause
