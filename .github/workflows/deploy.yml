@@ -1,0 +1,25 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Backend
+        run: docker build -t backend ./backend
+
+      - name: Build Frontend
+        run: docker build -t frontend ./frontend
+
+      - name: Build Payments
+        run: docker build -t payments ./payments-service
