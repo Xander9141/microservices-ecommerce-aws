@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import requests
 
 app = FastAPI(title="Ecommerce Backend API")
 
@@ -39,8 +40,21 @@ def get_cart():
 
 @app.post("/pay")
 def process_payment(payment: PaymentRequest):
-    return {
-        "message": "Pago enviado al microservicio de pagos",
-        "payment": payment.dict(),
-        "status": "pending"
-    }
+    try:
+        response = requests.post(
+            "http://payments:9000/payments",
+            json=payment.dict(),
+            timeout=5
+        )
+
+        return {
+            "message": "Pago procesado desde backend",
+            "payment_service_response": response.json()
+        }
+
+    except Exception as error:
+        return {
+            "message": "No se pudo conectar con el microservicio de pagos",
+            "error": str(error),
+            "status": "failed"
+        }
