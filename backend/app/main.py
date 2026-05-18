@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
-import sqlite3
+import psycopg2
+import os
+import time
 
 app = FastAPI(title="Ecommerce Backend API")
 
@@ -14,20 +16,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-conn = sqlite3.connect("ecommerce.db", check_same_thread=False)
+time.sleep(5)
+
+conn = psycopg2.connect(
+    host=os.getenv("DB_HOST"),
+    database=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    port=os.getenv("DB_PORT")
+)
+
 cursor = conn.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
     price INTEGER
 )
 """)
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS cart (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     product_id INTEGER,
     quantity INTEGER
 )
@@ -40,11 +51,11 @@ count = cursor.fetchone()[0]
 
 if count == 0:
     cursor.executemany(
-        "INSERT INTO products (id, name, price) VALUES (?, ?, ?)",
+        "INSERT INTO products (name, price) VALUES (%s, %s)",
         [
-            (1, "Notebook", 750000),
-            (2, "Mouse", 12000),
-            (3, "Teclado", 25000)
+            ("Notebook", 750000),
+            ("Mouse", 12000),
+            ("Teclado", 25000)
         ]
     )
     conn.commit()
@@ -60,7 +71,7 @@ class PaymentRequest(BaseModel):
 
 @app.get("/")
 def home():
-    return {"message": "Backend Ecommerce API funcionando"}
+    return {"message": "Backend Ecommerce API funcionando con PostgreSQL"}
 
 @app.get("/products")
 def get_products():
@@ -81,7 +92,7 @@ def get_products():
 def add_to_cart(item: CartItem):
 
     cursor.execute(
-        "INSERT INTO cart (product_id, quantity) VALUES (?, ?)",
+        "INSERT INTO cart (product_id, quantity) VALUES (%s, %s)",
         (item.product_id, item.quantity)
     )
 
