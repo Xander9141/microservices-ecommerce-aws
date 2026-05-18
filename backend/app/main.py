@@ -44,6 +44,14 @@ CREATE TABLE IF NOT EXISTS cart (
 )
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(100) UNIQUE,
+    password VARCHAR(100)
+)
+""")
+
 conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM products")
@@ -60,22 +68,68 @@ if count == 0:
     )
     conn.commit()
 
+
 class CartItem(BaseModel):
     product_id: int
     quantity: int
+
 
 class PaymentRequest(BaseModel):
     user_id: int
     amount: int
     method: str
 
+
+class User(BaseModel):
+    username: str
+    password: str
+
+
 @app.get("/")
 def home():
     return {"message": "Backend Ecommerce API funcionando con PostgreSQL"}
 
+
+@app.post("/register")
+def register(user: User):
+    try:
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s)",
+            (user.username, user.password)
+        )
+        conn.commit()
+
+        return {"message": "Usuario registrado correctamente"}
+
+    except Exception as error:
+        conn.rollback()
+        return {
+            "message": "No se pudo registrar el usuario",
+            "error": str(error)
+        }
+
+
+@app.post("/login")
+def login(user: User):
+    cursor.execute(
+        "SELECT * FROM users WHERE username = %s AND password = %s",
+        (user.username, user.password)
+    )
+
+    result = cursor.fetchone()
+
+    if result:
+        return {
+            "message": "Inicio de sesión correcto",
+            "user_id": result[0],
+            "username": result[1]
+        }
+
+    return {"message": "Credenciales inválidas"}
+
+
 @app.get("/products")
 def get_products():
-
     cursor.execute("SELECT * FROM products")
     rows = cursor.fetchall()
 
@@ -88,9 +142,9 @@ def get_products():
         for row in rows
     ]
 
+
 @app.post("/cart")
 def add_to_cart(item: CartItem):
-
     cursor.execute(
         "INSERT INTO cart (product_id, quantity) VALUES (%s, %s)",
         (item.product_id, item.quantity)
@@ -98,13 +152,11 @@ def add_to_cart(item: CartItem):
 
     conn.commit()
 
-    return {
-        "message": "Producto agregado al carrito"
-    }
+    return {"message": "Producto agregado al carrito"}
+
 
 @app.get("/cart")
 def get_cart():
-
     cursor.execute("SELECT * FROM cart")
     rows = cursor.fetchall()
 
@@ -117,11 +169,10 @@ def get_cart():
         for row in rows
     ]
 
+
 @app.post("/pay")
 def process_payment(payment: PaymentRequest):
-
     try:
-
         response = requests.post(
             "http://payments:9000/payments",
             json=payment.dict(),
@@ -134,7 +185,6 @@ def process_payment(payment: PaymentRequest):
         }
 
     except Exception as error:
-
         return {
             "message": "No se pudo conectar con el microservicio de pagos",
             "error": str(error),
