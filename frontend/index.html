@@ -4,45 +4,29 @@
   <meta charset="UTF-8">
   <title>Ecommerce Microservices AWS</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      padding: 40px;
-    }
-    h1 {
-      color: #222;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      margin: 15px 0;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      background: #2563eb;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    body { font-family: Arial; background: #f4f6f8; padding: 40px; }
+    .card { background: white; padding: 20px; margin: 15px 0; border-radius: 10px; }
+    button { padding: 10px 15px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; }
   </style>
 </head>
 <body>
 
   <h1>Ecommerce Microservices AWS</h1>
-  <p>Frontend conectado a backend FastAPI y microservicio de pagos.</p>
+  <p>Frontend conectado a Backend, PostgreSQL y microservicio de pagos.</p>
 
   <h2>Productos</h2>
   <div id="products"></div>
+
+  <h2>Pago</h2>
+  <button onclick="pay()">Pagar carrito</button>
+  <pre id="paymentResult"></pre>
 
   <script>
     async function loadProducts() {
       const response = await fetch("http://localhost:8000/products");
       const products = await response.json();
-
       const container = document.getElementById("products");
+
       container.innerHTML = "";
 
       products.forEach(product => {
@@ -59,16 +43,26 @@
     async function addToCart(productId) {
       await fetch("http://localhost:8000/cart", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          product_id: productId,
-          quantity: 1
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id: productId, quantity: 1 })
       });
 
       alert("Producto agregado al carrito");
+    }
+
+    async function pay() {
+      const response = await fetch("http://localhost:8000/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: 1,
+          amount: 25000,
+          method: "debit"
+        })
+      });
+
+      const result = await response.json();
+      document.getElementById("paymentResult").textContent = JSON.stringify(result, null, 2);
     }
 
     loadProducts();
