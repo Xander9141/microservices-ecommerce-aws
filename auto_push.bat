@@ -6,23 +6,26 @@ echo.
 
 cd /d "C:\Users\Admin\Desktop\microservices-ecommerce-aws"
 
-echo Revisando cambios...
-git status
+git status --short > temp_status.txt
 
-echo.
-echo Agregando archivos...
+for %%A in (temp_status.txt) do if %%~zA==0 (
+    echo No hay cambios para subir.
+    del temp_status.txt
+    pause
+    exit /b
+)
+
+del temp_status.txt
+
+echo Agregando cambios...
 git add .
 
-echo.
 echo Creando commit...
 git commit -m "Auto update %date% %time%"
 
-echo.
 echo Subiendo a GitHub...
 git push
 
 echo.
-echo ================================
-echo   PROCESO TERMINADO
-echo ================================
+echo Listo. Cambios subidos correctamente.
 pause
