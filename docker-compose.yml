@@ -6,11 +6,15 @@ services:
     build: ./frontend
     ports:
       - "80:80"
+    depends_on:
+      - backend
 
   backend:
     build: ./backend
     ports:
       - "8000:8000"
+    depends_on:
+      - payments
 
   payments:
     build: ./payments-service
