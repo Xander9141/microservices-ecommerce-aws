@@ -16,15 +16,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-time.sleep(5)
+connected = False
 
-conn = psycopg2.connect(
-    host=os.getenv("DB_HOST"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    port=os.getenv("DB_PORT")
-)
+while not connected:
+    try:
+        conn = psycopg2.connect(
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            port=os.getenv("DB_PORT")
+        )
+
+        connected = True
+        print("PostgreSQL conectado correctamente")
+
+    except Exception as error:
+        print("Esperando PostgreSQL...")
+        print(error)
+        time.sleep(2)
 
 cursor = conn.cursor()
 
