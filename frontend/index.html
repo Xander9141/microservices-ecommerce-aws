@@ -2,84 +2,136 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Microservices Ecommerce AWS</title>
+  <title>WorkShop Ecommerce Cloud</title>
   <style>
-    body{margin:0;font-family:Arial;background:#eef2f7;color:#111827}
-    header{background:linear-gradient(135deg,#0f172a,#2563eb);color:white;padding:35px}
-    main{padding:25px;display:grid;gap:22px}
-    .card{background:white;border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#eef2f7;color:#111827}
+    header{background:linear-gradient(135deg,#020617,#1d4ed8);color:white;padding:38px}
+    header h1{margin:0;font-size:36px}
+    header p{opacity:.9}
+    main{padding:28px;display:grid;gap:22px}
+    .layout{display:grid;grid-template-columns:1.2fr .8fr;gap:22px}
+    .card{background:white;border-radius:18px;padding:22px;box-shadow:0 10px 25px rgba(15,23,42,.09)}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
-    button{background:#2563eb;color:white;border:0;border-radius:10px;padding:10px 14px;cursor:pointer;margin:4px}
-    button:hover{background:#1d4ed8}
-    input{padding:10px;border:1px solid #cbd5e1;border-radius:8px;margin:5px}
-    pre{background:#0f172a;color:#22c55e;padding:15px;border-radius:12px;overflow:auto}
-    .tag{display:inline-block;background:#dbeafe;color:#1d4ed8;padding:6px 10px;border-radius:999px;margin:4px}
+    button{background:#2563eb;color:white;border:0;border-radius:10px;padding:11px 15px;cursor:pointer;margin:4px;font-weight:600}
+    button:hover{background:#1e40af}
+    .danger{background:#dc2626}
+    .success{background:#16a34a}
+    input{padding:11px;border:1px solid #cbd5e1;border-radius:9px;margin:5px;width:180px}
+    pre{background:#020617;color:#22c55e;padding:15px;border-radius:12px;overflow:auto;max-height:250px}
+    .tag{display:inline-block;background:#dbeafe;color:#1d4ed8;padding:7px 12px;border-radius:999px;margin:4px;font-size:14px}
+    .product h3{margin-top:0}
+    .price{font-size:22px;font-weight:700;color:#16a34a}
+    .status{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+    .status div{background:#f8fafc;border-left:5px solid #2563eb;padding:14px;border-radius:10px}
+    footer{text-align:center;padding:20px;color:#64748b}
   </style>
 </head>
 <body>
 
 <header>
   <h1>Microservices Ecommerce AWS</h1>
-  <p>Frontend + FastAPI + PostgreSQL + Payments Service + Docker Compose</p>
-  <span class="tag">Docker</span>
-  <span class="tag">FastAPI</span>
-  <span class="tag">PostgreSQL</span>
-  <span class="tag">Microservices</span>
+  <p>Demo funcional: Frontend + Backend API + PostgreSQL + Payments Service + Docker Compose</p>
+  <span class="tag">🐳 Docker</span>
+  <span class="tag">⚡ FastAPI</span>
+  <span class="tag">🐘 PostgreSQL</span>
+  <span class="tag">💳 Payments API</span>
+  <span class="tag">☁️ Cloud Ready</span>
 </header>
 
 <main>
 
 <section class="card">
-  <h2>👤 Usuario</h2>
-  <input id="username" placeholder="Usuario" value="ramon">
-  <input id="password" placeholder="Contraseña" value="1234">
-  <button onclick="register()">Registrar</button>
-  <button onclick="login()">Iniciar sesión</button>
-  <pre id="userResult">Esperando acción...</pre>
+  <h2>📌 Estado de Servicios</h2>
+  <div class="status">
+    <div><b>Frontend</b><br>Puerto 80</div>
+    <div><b>Backend API</b><br>Puerto 8000</div>
+    <div><b>Payments</b><br>Puerto 9000</div>
+    <div><b>PostgreSQL</b><br>Puerto 5432</div>
+  </div>
 </section>
 
+<div class="layout">
+
+  <section class="card">
+    <h2>👤 Usuario</h2>
+    <p>Registro e inicio de sesión persistidos en PostgreSQL.</p>
+    <input id="username" placeholder="Usuario" value="ramon">
+    <input id="password" placeholder="Contraseña" value="1234">
+    <br>
+    <button onclick="register()">Registrar</button>
+    <button onclick="login()">Iniciar sesión</button>
+    <pre id="userResult">Esperando acción...</pre>
+  </section>
+
+  <section class="card">
+    <h2>🧪 Swagger / API Docs</h2>
+    <p>Documentación automática generada por FastAPI.</p>
+    <button onclick="window.open('http://localhost:8000/docs','_blank')">Abrir Swagger</button>
+    <button onclick="checkBackend()">Probar Backend</button>
+    <pre id="backendResult">Backend no probado.</pre>
+  </section>
+
+</div>
+
 <section>
-  <h2>🛒 Productos</h2>
+  <h2>🛒 Catálogo de Productos</h2>
   <div id="products" class="grid"></div>
 </section>
 
-<section class="card">
-  <h2>📦 Carrito</h2>
-  <button onclick="loadCart()">Ver carrito</button>
-  <pre id="cartResult">Carrito vacío o no consultado.</pre>
-</section>
+<div class="layout">
 
-<section class="card">
-  <h2>💳 Pago</h2>
-  <button onclick="pay()">Pagar carrito</button>
-  <pre id="paymentResult">Pago no ejecutado.</pre>
-</section>
+  <section class="card">
+    <h2>📦 Carrito</h2>
+    <p>Los productos agregados se guardan en PostgreSQL.</p>
+    <button onclick="loadCart()">Ver carrito</button>
+    <pre id="cartResult">Carrito vacío o no consultado.</pre>
+  </section>
+
+  <section class="card">
+    <h2>💳 Pago</h2>
+    <p>El backend se comunica con el microservicio independiente de pagos.</p>
+    <button class="success" onclick="pay()">Pagar carrito</button>
+    <pre id="paymentResult">Pago no ejecutado.</pre>
+  </section>
+
+</div>
 
 </main>
+
+<footer>
+  Proyecto académico — Arquitectura de Microservicios con Docker y PostgreSQL
+</footer>
 
 <script>
 const API = "http://localhost:8000";
 
 async function loadProducts(){
-  const response = await fetch(`${API}/products`);
-  const products = await response.json();
-  const container = document.getElementById("products");
-  container.innerHTML = "";
+  try{
+    const response = await fetch(`${API}/products`);
+    const products = await response.json();
+    const container = document.getElementById("products");
+    container.innerHTML = "";
 
-  if(!products || products.length === 0){
-    container.innerHTML = "<div class='card'>No hay productos disponibles.</div>";
-    return;
+    if(!products || products.length === 0){
+      container.innerHTML = "<div class='card'>No hay productos disponibles.</div>";
+      return;
+    }
+
+    products.forEach(product=>{
+      container.innerHTML += `
+        <div class="card product">
+          <h3>${product.name}</h3>
+          <p class="price">$${product.price}</p>
+          <p>ID Producto: ${product.id}</p>
+          <button onclick="addToCart(${product.id})">Agregar al carrito</button>
+        </div>
+      `;
+    });
+  }catch(error){
+    document.getElementById("products").innerHTML =
+      "<div class='card'>No se pudo conectar con el backend.</div>";
   }
-
-  products.forEach(product=>{
-    container.innerHTML += `
-      <div class="card">
-        <h3>${product.name}</h3>
-        <p><b>Precio:</b> $${product.price}</p>
-        <button onclick="addToCart(${product.id})">Agregar al carrito</button>
-      </div>
-    `;
-  });
 }
 
 async function addToCart(productId){
@@ -89,7 +141,6 @@ async function addToCart(productId){
     body:JSON.stringify({product_id:productId,quantity:1})
   });
   await loadCart();
-  alert("Producto agregado al carrito");
 }
 
 async function loadCart(){
@@ -132,6 +183,12 @@ async function pay(){
   });
   const result = await response.json();
   document.getElementById("paymentResult").textContent = JSON.stringify(result,null,2);
+}
+
+async function checkBackend(){
+  const response = await fetch(`${API}/`);
+  const result = await response.json();
+  document.getElementById("backendResult").textContent = JSON.stringify(result,null,2);
 }
 
 loadProducts();
