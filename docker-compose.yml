@@ -1,0 +1,50 @@
+services:
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - payments
+      - database
+    environment:
+      DB_HOST: database
+      DB_NAME: ecommerce
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+
+  payments:
+    build: ./payments-service
+    ports:
+      - "9000:9000"
+  
+  notifications:
+    build: ./notifications-service
+    env_file:
+      - .env
+    ports:
+      - "9001:9001"
+
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

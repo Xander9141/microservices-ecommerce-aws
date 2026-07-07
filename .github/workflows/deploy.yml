@@ -1,0 +1,25 @@
+name: CI/CD Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Desplegar en la instancia EC2 vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 3.141.97.24
+          username: ubuntu
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            cd microservices-ecommerce-aws
+            git pull origin main
+            docker-compose up -d --build
